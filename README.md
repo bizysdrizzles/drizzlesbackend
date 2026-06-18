@@ -1,7 +1,7 @@
 # Bizy's Drizzles Backend API
 
 
-## 🚀 Features
+## Features
 
 - **Authentication & Authorization**
   - JWT-based authentication
