@@ -160,17 +160,26 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create reset url
-  const resetUrl = `${req.protocol}://${req.get(
-    'host'
-  )}/api/auth/resetpassword/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+  const message = `You requested a password reset. Visit this link to reset your password: ${resetUrl} (expires in 10 minutes). If you didn't request this, ignore this email.`;
+
+  const html = `
+  <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+    <h2 style="color: #4F2C14;">Password Reset Request</h2>
+    <p>You requested a password reset for your Bizy's Drizzles account.</p>
+    <p>Click the button below to set a new password. This link expires in 10 minutes.</p>
+    <a href="${resetUrl}" style="display: inline-block; background: #E19C86; color: white; padding: 12px 28px; border-radius: 24px; text-decoration: none; font-weight: 600; margin: 16px 0;">Reset Password</a>
+    <p style="color: #888; font-size: 0.85rem;">If you didn't request this, you can safely ignore this email.</p>
+  </div>
+`;
 
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Password reset token',
+      subject: 'Password Reset Request - Bizy\'s Drizzles',
       message,
+      html,
     });
 
     res.status(200).json({ success: true, data: 'Email sent' });
@@ -237,8 +246,7 @@ const sendTokenResponse = (user, statusCode, res) => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       role: user.role,
-      isLoyaltyMember: user.isLoyaltyMember,
-      completedOrdersCount: user.completedOrdersCount,
+      saucesOrderedCount: user.saucesOrderedCount,
     },
   });
 };
