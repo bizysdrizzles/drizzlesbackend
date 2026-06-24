@@ -79,6 +79,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    shippingFee: { type: Number, default: 100 },
     promoCode: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'PromoCode',

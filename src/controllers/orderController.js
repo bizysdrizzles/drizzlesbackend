@@ -93,7 +93,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     // Apply promo code discount (if any)
     let promoDiscount = 0;
     let promoCodeData = null;
-    
+
     if (promoCode) {
       const promo = await PromoCode.findOne({ code: promoCode.toUpperCase() }).session(session);
       if (promo && promo.isValid()) {
@@ -107,7 +107,8 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       }
     }
 
-    const total = subtotal - promoDiscount;
+    const SHIPPING_FEE = 100; // Fixed shipping cost in EGP — server-side, never trust client input for this
+    const total = subtotal - promoDiscount + SHIPPING_FEE;
 
     // Create order
     const orderData = {
@@ -115,16 +116,16 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       shippingAddress,
       subtotal: subtotal + totalDiscount, // Original subtotal before loyalty discount
       discount: totalDiscount + promoDiscount,
+      shippingFee: SHIPPING_FEE,
       total,
       saucesInOrder: totalSaucesInOrder
     };
-
     if (isGuest) {
       orderData.guestEmail = guestEmail;
       orderData.guestPhone = guestPhone;
     } else {
       orderData.user = req.user.id;
-      
+
       // Update user's sauce count
       const user = await User.findById(req.user.id).session(session);
       user.saucesOrderedCount = userSauceCount;
@@ -269,9 +270,10 @@ exports.updateOrder = asyncHandler(async (req, res, next) => {
         subtotal += product.price * item.quantity;
       }
 
+
       order.orderItems = processedItems;
       order.subtotal = subtotal;
-      order.total = subtotal - order.discount;
+      order.total = subtotal - order.discount + (order.shippingFee || 100);
     }
 
     // Update shipping address if provided
