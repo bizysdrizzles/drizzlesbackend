@@ -33,7 +33,7 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
 // @route   GET /api/products/:id
 // @access  Public
 exports.getProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id).select('-stock');
+  const product = await Product.findById(req.params.id);
 
   if (!product || !product.isActive) {
     return next(new ErrorResponse('Product not found', 404));

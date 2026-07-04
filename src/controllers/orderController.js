@@ -386,7 +386,7 @@ exports.getAllOrders = asyncHandler(async (req, res, next) => {
   const skip = (page - 1) * limit;
 
   const orders = await Order.find()
-    .populate('user', 'fullName email')
+    .populate('user', 'fullName email phoneNumber')
     .sort('-createdAt')
     .skip(skip)
     .limit(limit);
