@@ -107,7 +107,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       }
     }
 
-    const SHIPPING_FEE = 100; // Fixed shipping cost in EGP — server-side, never trust client input for this
+    const SHIPPING_FEE = 120; // Fixed shipping cost in EGP — server-side, never trust client input for this
     const total = subtotal - promoDiscount + SHIPPING_FEE;
 
     // Create order
